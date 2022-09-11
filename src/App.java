@@ -4,7 +4,7 @@ import java.util.Vector;
 //Aluno: Luiz Gustavo Klitzke
 
 public class App {
-    private static boolean ehDirigido(Integer[][] matrizAdjacencia) //Criei separado para facilitar, porque tem que ser usado em todos os outros metodos
+    private static boolean ehDirigido(Integer[][] matrizAdjacencia)
     {
         final int ordem = matrizAdjacencia.length;
 
@@ -22,6 +22,49 @@ public class App {
         return false;
     }
 
+    private static void getGrausNaoDirigido(Integer[][] matrizAdjacencia, Vector<Integer> graus)
+    {
+        final int ordem = matrizAdjacencia.length;
+
+        for (int i = 0; i < ordem; ++i)
+        {
+            Integer grauVerticeNaoDirigido = 0;
+            for (int j = 0; j < ordem; ++j)
+            {
+                if (i == j)
+                {
+                    grauVerticeNaoDirigido += matrizAdjacencia[i][j] * 2;
+                }
+                else
+                {
+                    grauVerticeNaoDirigido += matrizAdjacencia[i][j];
+                }
+            }
+
+            graus.add(grauVerticeNaoDirigido);
+        }
+    }
+
+    private static void getGrausDirigido(Integer[][] matrizAdjacencia, Vector<Integer> grausEntrada, Vector<Integer> grausSaida)
+    {
+        final int ordem = matrizAdjacencia.length;
+
+        for (int i = 0; i < ordem; ++i)
+        {
+            Integer grauEntrada = 0;
+            Integer grauSaida = 0;
+
+            for (int j = 0; j < ordem; ++j)
+            {
+                grauEntrada += matrizAdjacencia[j][i];
+                grauSaida += matrizAdjacencia[i][j];
+            }
+
+            grausEntrada.add(grauEntrada);
+            grausSaida.add(grauSaida);
+        }
+    }
+
     //Qual  é  o  tipo  do  grafo  (dirigido  ou  não,  simples  ou  multigrafo,  regular,  completo,  nulo  ou bipartido) 
     public static String tipoDoGrafo(Integer[][] matrizAdjacencia)
     {
@@ -34,6 +77,7 @@ public class App {
         boolean nulo = true;
         boolean simples = true;
         boolean completo = true;
+        boolean bipartido = true;
 
         for (int i = 0; i < ordem; ++i)
         {
@@ -49,6 +93,12 @@ public class App {
                     {
                         simples = false;
                     }
+
+                    if (i == j) // Laço
+                    {
+                        simples = false;
+                        bipartido = false;
+                    }
                 }
                 else if (simples && i != j) //Zerado fora da diagonal principal
                 {
@@ -57,7 +107,45 @@ public class App {
             }
         }
 
-        tipoGrafo += dirigido ? "" : "não " + "dirigido";
+        tipoGrafo += (dirigido ? "" : "não ") + "dirigido";
+
+        boolean regular = true;
+
+        if (dirigido)
+        {
+            Vector<Integer> grausEntrada = new Vector<Integer>();
+            Vector<Integer> grausSaida = new Vector<Integer>();
+
+            getGrausDirigido(matrizAdjacencia, grausEntrada, grausSaida);
+
+            for (int i = 1; i < ordem; ++i)
+            {
+                if (grausEntrada.get(i) != grausEntrada.get(i - 1) || grausSaida.get(i) != grausSaida.get(i - 1))
+                {
+                    regular = false;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            Vector<Integer> graus = new Vector<Integer>();
+            getGrausNaoDirigido(matrizAdjacencia, graus);
+
+            for (int i = 1; i < ordem; ++i)
+            {
+                if (graus.get(i) != graus.get(i - 1))
+                {
+                    regular = false;
+                    break;
+                }
+            }
+        }
+
+        if (regular)
+        {
+            tipoGrafo += ", regular";
+        }
 
         if (nulo)
         {
@@ -72,28 +160,34 @@ public class App {
         int[] separacaoGrupos = new int[ordem];
         separacaoGrupos[0] = 1; //Primeiro vertice sempre comeca no meu grupo 1
 
-        boolean bipartido = true;
-
-        for (int i = 1; i < ordem; ++i) // Descobrir bipartido separado
+        if (bipartido)
         {
-            for (int j = 0; j < i; ++j)
+            for (int i = 1; i < ordem; ++i)
             {
-                if (matrizAdjacencia[i][j] != 0)
+                for (int j = 0; j < i; ++j)
                 {
-                    if (separacaoGrupos[i] != 0 && separacaoGrupos[j] == separacaoGrupos[i])
+                    if (matrizAdjacencia[i][j] != 0)
                     {
-                       bipartido = false;
-                       break;
+                        if (separacaoGrupos[i] != 0 && separacaoGrupos[j] == separacaoGrupos[i])
+                        {
+                            bipartido = false;
+                            break;
+                        }
+                        
+                        if (separacaoGrupos[j] == 1)
+                        {
+                            separacaoGrupos[i] = 2;
+                        }
+                        else if (separacaoGrupos[j] == 2)
+                        {
+                            separacaoGrupos[i] = 1; 
+                        }
                     }
-                    
-                    if (separacaoGrupos[j] == 1)
-                    {
-                        separacaoGrupos[i] = 2;
-                    }
-                    else if (separacaoGrupos[j] == 2)
-                    {
-                        separacaoGrupos[i] = 1; 
-                    }
+                }
+
+                if (bipartido == false)
+                {
+                    break;
                 }
             }
         }
@@ -167,22 +261,9 @@ public class App {
             Vector<Integer> grausEntrada = new Vector<Integer>();
             Vector<Integer> grausSaida = new Vector<Integer>();
 
-            for (int i = 0; i < ordem; ++i)
-            {
-                Integer grauEntrada = 0;
-                Integer grauSaida = 0;
+            getGrausDirigido(matrizAdjacencia, grausEntrada, grausSaida);
 
-                for (int j = 0; j < ordem; ++j)
-                {
-                    grauEntrada += matrizAdjacencia[j][i];
-                    grauSaida += matrizAdjacencia[i][j];
-                }
-
-                grausEntrada.add(grauEntrada);
-                grausSaida.add(grauSaida);
-            }
-
-            retorno += "\nGraus de Entrada: ";
+            retorno += "Graus de Entrada: ";
             for (int i = 0; i < ordem; ++i)
             {
                 retorno += String.format("%sv%d : %d", (i == 0 ? "" : ", "), i + 1, grausEntrada.get(i));
@@ -214,24 +295,11 @@ public class App {
 
             retorno += "Graus dos vértices: ";
 
+            getGrausNaoDirigido(matrizAdjacencia, graus);
+
             for (int i = 0; i < ordem; ++i)
             {
-                Integer grauVerticeNaoDirigido = 0;
-                for (int j = 0; j < ordem; ++j)
-                {
-                    if (i == j)
-                    {
-                        grauVerticeNaoDirigido += matrizAdjacencia[i][j] * 2;
-                    }
-                    else
-                    {
-                        grauVerticeNaoDirigido += matrizAdjacencia[i][j];
-                    }
-                }
-
-                retorno += String.format("%sv%d : %d", (i == 0 ? "" : ", "), i + 1, grauVerticeNaoDirigido);
-
-                graus.add(grauVerticeNaoDirigido);
+                retorno += String.format("%sv%d : %d", (i == 0 ? "" : ", "), i + 1, graus.get(i));
             }
 
             Collections.sort(graus);
@@ -254,9 +322,10 @@ public class App {
             {1, 1, 0}
         };
 
+        System.out.println(tipoDoGrafo(matrizAdjacencia));
         System.out.println(arestasDoGrafo(matrizAdjacencia));
         System.out.println(grausDoVertice(matrizAdjacencia));
-        System.out.println("");
+        System.out.println("--------------------------------------------");
 
         Integer[][] matrizAdjacencia2 = 
         {
@@ -266,9 +335,11 @@ public class App {
             {1, 1, 1, 0}
         };
 
+        System.out.println(tipoDoGrafo(matrizAdjacencia2));
         System.out.println(arestasDoGrafo(matrizAdjacencia2));
         System.out.println(grausDoVertice(matrizAdjacencia2));
-        System.out.println("");
+        System.out.println("--------------------------------------------");
+
 
         Integer[][] matrizAdjacencia3 = 
         {
@@ -278,9 +349,11 @@ public class App {
             {0, 0, 1, 0}
         };
 
+        System.out.println(tipoDoGrafo(matrizAdjacencia3));
         System.out.println(arestasDoGrafo(matrizAdjacencia3));
         System.out.println(grausDoVertice(matrizAdjacencia3));
-        System.out.println("");
+        System.out.println("--------------------------------------------");
+
 
         Integer[][] matrizAdjacencia4 = 
         {
@@ -290,8 +363,24 @@ public class App {
             {1, 1, 0, 1}
         };
 
+        System.out.println(tipoDoGrafo(matrizAdjacencia4));
         System.out.println(arestasDoGrafo(matrizAdjacencia4));
         System.out.println(grausDoVertice(matrizAdjacencia4));
-        System.out.println("");
+        System.out.println("--------------------------------------------");
+
+        
+        Integer[][] matrizAdjacencia5 = // quadrado
+        {
+            {0, 1, 1, 0},
+            {1, 0, 0, 1},
+            {1, 0, 0, 1},
+            {0, 1, 1, 0}
+        };
+
+        System.out.println(tipoDoGrafo(matrizAdjacencia5));
+        System.out.println(arestasDoGrafo(matrizAdjacencia5));
+        System.out.println(grausDoVertice(matrizAdjacencia5));
+        System.out.println("--------------------------------------------");
+
     }
 }
