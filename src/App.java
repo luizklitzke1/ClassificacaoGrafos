@@ -1,3 +1,6 @@
+import java.util.Collections;
+import java.util.Vector;
+
 //Aluno: Luiz Gustavo Klitzke
 
 public class App {
@@ -119,11 +122,11 @@ public class App {
                 for (int j = 0; j < ordem; ++j)
                 {
                     qtdLigacoes = matrizAdjacencia[i][j];
-                    qtdArestas += qtdLigacoes;
 
                     for (int k = 0; k < qtdLigacoes; ++k)
                     {
-                        arestas += String.format("(v%d, v%d) ", i + 1, j + 1);
+                        arestas += String.format("%s(v%d, v%d)", (qtdArestas == 0 ? "" : " ,"), i + 1, j + 1);
+                        ++qtdArestas;
                     }
                 }
             }
@@ -135,17 +138,17 @@ public class App {
                 for (int j = i; j < ordem; ++j) // só acima da principal, para ficar melhor ordenado
                 {
                     qtdLigacoes = matrizAdjacencia[i][j];
-                    qtdArestas += qtdLigacoes;
 
                     for (int k = 0; k < qtdLigacoes; ++k)
                     {
-                        arestas += String.format("(v%d, v%d) ", i + 1, j + 1);
+                        arestas += String.format("%s(v%d, v%d)", (qtdArestas == 0 ? "" : ", "),  i + 1, j + 1);
+                        ++qtdArestas;
                     }
                 }
             }
         }
 
-        arestas += "}";
+        arestas += " }";
 
         return String.format("Quantidade Arestas: %d. %s", qtdArestas, arestas);
     }
@@ -153,8 +156,91 @@ public class App {
     //Qual é o graude cada vértice. Liste a sequência de graus
     public static String grausDoVertice(Integer[][] matrizAdjacencia)
     {
+        final int ordem = matrizAdjacencia.length;
+        
+        boolean dirigido = ehDirigido(matrizAdjacencia);
+        
         String retorno = "";
 
+        if (dirigido)
+        {
+            Vector<Integer> grausEntrada = new Vector<Integer>();
+            Vector<Integer> grausSaida = new Vector<Integer>();
+
+            for (int i = 0; i < ordem; ++i)
+            {
+                Integer grauEntrada = 0;
+                Integer grauSaida = 0;
+
+                for (int j = 0; j < ordem; ++j)
+                {
+                    grauEntrada += matrizAdjacencia[j][i];
+                    grauSaida += matrizAdjacencia[i][j];
+                }
+
+                grausEntrada.add(grauEntrada);
+                grausSaida.add(grauSaida);
+            }
+
+            retorno += "\nGraus de Entrada: ";
+            for (int i = 0; i < ordem; ++i)
+            {
+                retorno += String.format("%sv%d : %d", (i == 0 ? "" : ", "), i + 1, grausEntrada.get(i));
+            }
+
+            Collections.sort(grausEntrada);
+            retorno += "\nSequência de graus de Entrada: ";
+            for (int i = 0; i < ordem; ++i)
+            {
+                retorno += String.format("%s%d", (i == 0 ? "" : ", " ), grausEntrada.get(i));
+            }
+
+            retorno += "\nGraus de Saída: ";
+            for (int i = 0; i < ordem; ++i)
+            {
+                retorno += String.format("%sv%d : %d", (i == 0 ? "" : ", "), i + 1, grausSaida.get(i));
+            }
+
+            Collections.sort(grausSaida);
+            retorno += "\nSequência de graus de Saída: ";
+            for (int i = 0; i < ordem; ++i)
+            {
+                retorno += String.format("%s%d", (i == 0 ? "" : ", " ), grausSaida.get(i));
+            }
+        }
+        else
+        {
+            Vector<Integer> graus = new Vector<Integer>();
+
+            retorno += "Graus dos vértices: ";
+
+            for (int i = 0; i < ordem; ++i)
+            {
+                Integer grauVerticeNaoDirigido = 0;
+                for (int j = 0; j < ordem; ++j)
+                {
+                    if (i == j)
+                    {
+                        grauVerticeNaoDirigido += matrizAdjacencia[i][j] * 2;
+                    }
+                    else
+                    {
+                        grauVerticeNaoDirigido += matrizAdjacencia[i][j];
+                    }
+                }
+
+                retorno += String.format("%sv%d : %d", (i == 0 ? "" : ", "), i + 1, grauVerticeNaoDirigido);
+
+                graus.add(grauVerticeNaoDirigido);
+            }
+
+            Collections.sort(graus);
+            retorno += "\nSequência de graus: ";
+            for (int i = 0; i < ordem; ++i)
+            {
+                retorno += String.format("%s%d", (i == 0 ? "" : ", " ), graus.get(i));
+            }
+        }
 
         return retorno;
     }
@@ -169,6 +255,8 @@ public class App {
         };
 
         System.out.println(arestasDoGrafo(matrizAdjacencia));
+        System.out.println(grausDoVertice(matrizAdjacencia));
+        System.out.println("");
 
         Integer[][] matrizAdjacencia2 = 
         {
@@ -179,15 +267,31 @@ public class App {
         };
 
         System.out.println(arestasDoGrafo(matrizAdjacencia2));
+        System.out.println(grausDoVertice(matrizAdjacencia2));
+        System.out.println("");
 
         Integer[][] matrizAdjacencia3 = 
         {
-            {0, 0, 1, 0},
-            {1, 0, 2, 0},
             {0, 0, 0, 1},
-            {1, 0, 1, 1}
+            {1, 0, 0, 2},
+            {1, 0, 1, 1},
+            {0, 0, 1, 0}
         };
 
         System.out.println(arestasDoGrafo(matrizAdjacencia3));
+        System.out.println(grausDoVertice(matrizAdjacencia3));
+        System.out.println("");
+
+        Integer[][] matrizAdjacencia4 = 
+        {
+            {0, 1, 2, 1},
+            {1, 0, 0, 1},
+            {2, 0, 0, 0},
+            {1, 1, 0, 1}
+        };
+
+        System.out.println(arestasDoGrafo(matrizAdjacencia4));
+        System.out.println(grausDoVertice(matrizAdjacencia4));
+        System.out.println("");
     }
 }
