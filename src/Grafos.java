@@ -2,7 +2,7 @@ import java.util.Arrays;
 
 //Aluno: Luiz Gustavo Klitzke
 
-public class App {
+public class Grafos {
     private static boolean ehDirigido(int[][] matrizAdjacencia)
     {
         final int ordem = matrizAdjacencia.length;
@@ -27,7 +27,8 @@ public class App {
 
         for (int i = 0; i < ordem; ++i)
         {
-            Integer grauVerticeNaoDirigido = 0;
+            int grauVerticeNaoDirigido = 0;
+
             for (int j = 0; j < ordem; ++j)
             {
                 if (i == j)
@@ -50,8 +51,8 @@ public class App {
 
         for (int i = 0; i < ordem; ++i)
         {
-            Integer grauEntrada = 0;
-            Integer grauSaida = 0;
+            int grauEntrada = 0;
+            int grauSaida = 0;
 
             for (int j = 0; j < ordem; ++j)
             {
@@ -322,21 +323,25 @@ public class App {
     {
         int[][] matrizAdjacencia = new int[4][4];
         matrizAdjacencia[0][0] = 0;
-        matrizAdjacencia[0][1] = 0;
-        matrizAdjacencia[0][2] = 0;
-        matrizAdjacencia[0][3] = 1;
+        matrizAdjacencia[0][1] = 1;
+        matrizAdjacencia[0][2] = 1;
+        matrizAdjacencia[0][3] = 0;
+        
         matrizAdjacencia[1][0] = 1;
         matrizAdjacencia[1][1] = 0;
         matrizAdjacencia[1][2] = 0;
-        matrizAdjacencia[1][3] = 2;
+        matrizAdjacencia[1][3] = 1;
+
         matrizAdjacencia[2][0] = 1;
         matrizAdjacencia[2][1] = 0;
-        matrizAdjacencia[2][2] = 1;
+        matrizAdjacencia[2][2] = 0;
         matrizAdjacencia[2][3] = 1;
+
         matrizAdjacencia[3][0] = 0;
-        matrizAdjacencia[3][1] = 0;
+        matrizAdjacencia[3][1] = 1;
         matrizAdjacencia[3][2] = 1;
         matrizAdjacencia[3][3] = 0;
+    
 
         System.out.println(tipoDoGrafo(matrizAdjacencia));
         System.out.println(arestasDoGrafo(matrizAdjacencia));
