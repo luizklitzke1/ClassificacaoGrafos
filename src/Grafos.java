@@ -321,31 +321,19 @@ public class Grafos {
 
     public static void main(String[] args) throws Exception 
     {
-        int[][] matrizAdjacencia = new int[4][4];
-        matrizAdjacencia[0][0] = 0;
+        int[][] matrizAdjacencia = new int[3][3];
+        matrizAdjacencia[0][0] = 1;
         matrizAdjacencia[0][1] = 1;
         matrizAdjacencia[0][2] = 1;
-        matrizAdjacencia[0][3] = 0;
-        
         matrizAdjacencia[1][0] = 1;
         matrizAdjacencia[1][1] = 0;
         matrizAdjacencia[1][2] = 0;
-        matrizAdjacencia[1][3] = 1;
-
         matrizAdjacencia[2][0] = 1;
         matrizAdjacencia[2][1] = 0;
         matrizAdjacencia[2][2] = 0;
-        matrizAdjacencia[2][3] = 1;
-
-        matrizAdjacencia[3][0] = 0;
-        matrizAdjacencia[3][1] = 1;
-        matrizAdjacencia[3][2] = 1;
-        matrizAdjacencia[3][3] = 0;
-    
 
         System.out.println(tipoDoGrafo(matrizAdjacencia));
         System.out.println(arestasDoGrafo(matrizAdjacencia));
         System.out.println(grausDoVertice(matrizAdjacencia));
-        System.out.println("--------------------------------------------");
     }
 }
